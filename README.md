@@ -1,6 +1,8 @@
 # RR_Machine_Simulator
 Simple machine language simulator written in C
+
 Inspired/made in spite of the Brookshear machine. Intent is to eventually finish the delay portion of the run functions and add a graphical front end so that this can be used as an open source educational resource for introductory CS classes.
+
 This machine is not meant to replicate existing modern CPU instruction sets or architecture, nor is it meant to necessarily emulate "good" CPU design. Instead, it is intended to be a simplified view of machine language and processor cycles for early students - similar to the Brookshear machine. 
 
 Currently no command-line or graphical interface exists. The machine is a struct (rr_machine_t) consisting of the following fields:
