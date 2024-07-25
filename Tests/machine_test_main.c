@@ -1,5 +1,4 @@
-#include <assert.h>
-#include "rr_machine.h"
+#include "../rr_machine.h"
 
 s32 main(s32 argc, const char **argv) {
 	
@@ -10,6 +9,8 @@ s32 main(s32 argc, const char **argv) {
 	machine_run_full(test_machine, 0);
 	
 	machine_save(test_machine, "./test_a_out.bin");
+	
+	free(test_machine);
 	
 	return 0;
 	
