@@ -1,0 +1,76 @@
+HLT - 0___
+ADC - 1RST
+AND - 2RST
+ORR - 3RST
+XOR - 4RST
+LDI - 5RXX
+LDM - 6RMM
+STO - 7RMM
+PSH - 8R__
+POP - 9R__
+JMP - A_XX
+JSR - B_XX
+RET - C___
+BRZ - D_XX
+BRC - E_XX
+MDF - FI__
+
+00:
+	LDI 1, 51      51 51
+	PSH 1          81 DE
+	LDI 2, FF      52 FF
+	ADC 1, 1, 2    11 12
+	PSH 1          81 AD
+	JSR 80         BB 80
+	STO 1, 40      71 40
+	LDI 1, 00      51 00
+10:                
+	BRZ 14         D0 14
+	HLT            00 00
+	LDI 1, FF      51 FF
+	ADC 1, 1, 1    11 11
+	BRC 1C         E0 1C
+	HLT            00 00
+	MDF Z0,C0      FC 00
+	BRZ 00         D0 00
+20:                
+	BRC 00         E0 00
+	STO 1, 47      71 47	
+	HLT            00 FF
+	
+80:
+	PSH 1          81 BA
+	LDI 1, 20      51 20
+	STO 1, 41      71 41
+	LDI 1, AA      51 AA
+	LDI 2, 55      52 55
+	STO 2, 42      72 42
+	AND 3, 1, 2    23 12
+	STO 3, 43      73 43
+90:                
+	ORR 4, 1, 2    34 12
+	STO 4, 44      74 44
+	XOR 5, 2, 4    45 24
+	STO 5, 45      75 45
+	LDM 5, 41      65 41
+	STO 5, 46      75 46
+	POP 1          91 00
+	RET            C0 00
+	
+Expected output: 
+
+40:
+	50 20
+	55 00
+	FF AA
+	20 FF
+
+F0:
+	00 00
+	00 00
+	00 00
+	00 00
+	00 00
+	00 00
+	50 0C
+	50 51
