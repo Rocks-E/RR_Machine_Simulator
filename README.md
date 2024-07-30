@@ -49,36 +49,36 @@ The following instructions can be used in main memory:
   - 2RST
   - AND registers
   - S & T -> R
-- ORR
-  - 3RST
-  - OR Registers
-  - S | T -> R
 - XOR
-  - 4RST
+  - 3RST
   - XOR registers
   - S ^ T -> R
 - ROT
-  - 5RST
+  - 4RST
   - ROTate register
   - T[4] controls direction (0 for left, 1 for right)
   - T[567] control the count to rotate S by (0-7)
   - The carry bit is used as a "9th" bit off the left side for a left rotate or the right side for a right rotate
 - LDI
-  - 6RXX
+  - 5RXX
   - LoaD Immediate
   - XX -> R
 - LDM
-  - 7RMM
+  - 6RMM
   - LoaD from Memory
   - Mem[MM] -> R
 - LDR
-  - 8_RS
+  - 7_RS
   - LoaD from memory with Register offset
   - Mem[S] -> R 
 - STO
-  - 9RMM
+  - 8RMM
   - STOre in memory
   - R -> Mem[MM]
+- STR
+  - 9_RS
+  - STore  with Register offset
+  - R -> Mem[S]
 - PSH
   - AR__
   - PuSH register to stack
