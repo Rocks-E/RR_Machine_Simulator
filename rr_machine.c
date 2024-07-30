@@ -4,13 +4,13 @@ const char *instruction_mnemonics[16] = {
 	"HLT",
 	"ADC",
 	"AND",
-	"ORR",
 	"XOR",
 	"ROT",
 	"LDI",
 	"LDM",
 	"LDR",
 	"STO",
+	"STR",
 	"PSH",
 	"POP",
 	"JSR",
@@ -88,43 +88,43 @@ void machine_decode(rr_machine_t *machine) {
 		// AND registers, S & T -> R
 		// Sets zero if R = 0, clears otherwise
 		case 0x2:
-		// ORR - 3RST
-		// OR Registers, S | T -> R
-		// Sets zero if R = 0, clears otherwise
-		case 0x3:
-		// XOR - 4RST
+		// XOR - 3RST
 		// XOR registers, S ^ T -> R
 		// Sets zero if R = 0, clears otherwise
-		case 0x4:
-		// ROT - 5RST
+		case 0x3:
+		// ROT - 4RST
 		// ROTate register, S (<< | >>) T -> R
 		// T[4] controls direction, 0 for left, 1 for right
 		// Sets zero if R = 0, clears otherwise
 		// Carry will be set according to the last bit from S to be rotated out
-		case 0x5:
+		case 0x4:
 			machine->operands[1] = (machine->instruction_register >> 8) & 0xF;
 			machine->operands[2] = (machine->instruction_register >> 4) & 0xF;
 			machine->operands[3] = machine->instruction_register & 0xF;
 			break;
-		// LDI - 6RXX
+		// LDI - 5RXX
 		// LoaD Immediate, XX -> R
 		// Sets zero if R = 0, clears otherwise
-		case 0x6:
-		// LDM - 7RMM
+		case 0x5:
+		// LDM - 6RMM
 		// LoaD from Memory, Mem[MM] -> R
 		// Sets zero if R = 0, clears otherwise
-		case 0x7:
-		// STO - 9RMM
+		case 0x6:
+		// STO - 8RMM
 		// STOre register, R -> Mem[MM]
 		// Sets zero if R = 0, clears otherwise
-		case 0x9:
+		case 0x8:
 			machine->operands[1] = (machine->instruction_register >> 8) & 0xF;
 			machine->operands[2] = machine->instruction_register & 0xFF;
 			break;
-		// LDR - 8_RS
+		// LDR - 7_RS
 		// LoaD with Register offset, Mem[S] -> R
 		// Sets zero if R = 0, clears otherwise
-		case 0x8:
+		case 0x7:
+		// STR - 9_RS
+		// STore with Register offset, R -> Mem[S]
+		// Sets zero if R = 0, clears otherwise
+		case 0x9:
 			machine->operands[1] = (machine->instruction_register >> 4) & 0xF;
 			machine->operands[2] = machine->instruction_register & 0xF;
 			break;
@@ -203,18 +203,8 @@ void machine_execute(rr_machine_t *machine) {
 		
 			break;
 			
-		// OR
-		case 0x3:
-		
-			REG(machine, machine->operands[1]) = REG(machine, machine->operands[2]) | REG(machine, machine->operands[3]);
-		
-			// Update status register - [SS_C] -> maintain, [Z] -> set when the result is 0
-			machine->status_register = (machine->status_register & 0b1101) | ((REG(machine, machine->operands[1]) == 0) << 1);
-		
-			break;
-			
 		// XOR
-		case 0x4:
+		case 0x3:
 		
 			REG(machine, machine->operands[1]) = REG(machine, machine->operands[2]) ^ REG(machine, machine->operands[3]);
 		
@@ -224,7 +214,7 @@ void machine_execute(rr_machine_t *machine) {
 			break;
 			
 		// Rotate register
-		case 0x5:
+		case 0x4:
 		
 			// Early break if this should not rotate at all
 			if((REG(machine, machine->operands[3]) & 0b0111) == 0)
@@ -266,7 +256,7 @@ void machine_execute(rr_machine_t *machine) {
 			break;
 			
 		// Load immediate
-		case 0x6:
+		case 0x5:
 		
 			REG(machine, machine->operands[1]) = machine->operands[2];
 			
@@ -276,7 +266,7 @@ void machine_execute(rr_machine_t *machine) {
 			break;
 			
 		// Load from memory
-		case 0x7:
+		case 0x6:
 		
 			REG(machine, machine->operands[1]) = MEM(machine, machine->operands[2]);
 			
@@ -286,7 +276,7 @@ void machine_execute(rr_machine_t *machine) {
 			break;
 		
 		// Load from memory with register offset
-		case 0x8:
+		case 0x7:
 		
 			REG(machine, machine->operands[1]) = MEM(machine, REG(machine, machine->operands[2]));
 		
@@ -296,13 +286,23 @@ void machine_execute(rr_machine_t *machine) {
 			break;
 			
 		// Store
-		case 0x9:
+		case 0x8:
 		
 			MEM(machine, machine->operands[2]) = REG(machine, machine->operands[1]);
 			
 			// Update status register - [SS_C] -> maintain, [Z] -> set when the result is 0
 			machine->status_register = (machine->status_register & 0b1101) | ((REG(machine, machine->operands[1]) == 0) << 1);
 		
+			break;
+			
+		// Store at register offset
+		case 0x9:
+		
+			MEM(machine, REG(machine, machine->operands[2])) = REG(machine, machine->operands[1]);
+			
+			// Update status register - [SS_C] -> maintain, [Z] -> set when the result is 0
+			machine->status_register = (machine->status_register & 0b1101) | ((REG(machine, machine->operands[1]) == 0) << 1);
+			
 			break;
 			
 		// Push register

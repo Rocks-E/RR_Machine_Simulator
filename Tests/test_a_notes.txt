@@ -1,13 +1,13 @@
 HLT - 0___
 ADC - 1RST
 AND - 2RST
-ORR - 3RST
-XOR - 4RST
-ROT - 5RST
-LDI - 6RXX
-LDM - 7RMM
-LDR - 8_RS
-STO - 9RMM
+XOR - 3RST
+ROT - 4RST
+LDI - 5RXX
+LDM - 6RMM
+LDR - 7_RS
+STO - 8RMM
+STR - 9_RS
 PSH - AR__
 POP - BR__
 JSR - C_XX
@@ -16,11 +16,11 @@ BRA - EIXX
 MDF - FI__
 
 00:
-	LDI 1, 51      61 51	; r1	<- $51
+	LDI 1, 51      51 51	; r1	<- $51
 							; sr	<- %00
 	PSH 1          A1 DE	; [FF]	<- $51
 							; r15	<- $FE
-	LDI 2, FF      62 FF	; r2	<- $FF
+	LDI 2, FF      52 FF	; r2	<- $FF
 							; sr	<- %00
 	ADC 1, 1, 2    11 12	; r1	<- $50 = $51 + $FF
 							; sr	<- %01
@@ -29,15 +29,15 @@ MDF - FI__
 	JSR 80         CB 80	; [FD]	<- $0C
 							; r15	<- $FC
 							; pc	<- $80
-	STO 1, 40      91 40	; [40]	<- $50
+	STO 1, 40      81 40	; [40]	<- $50
 							; sr	<- %01
-	LDI 1, 00      61 00	; r1	<- $00
+	LDI 1, 00      51 00	; r1	<- $00
 							; sr	<- %11
 10:                
 	BRA Zs, 14     EA 14	; pc	<- $14
 							; sr	== %11
 	HLT            00 00	; Skip
-	LDI 1, FF      61 FF	; r1	<- $FF
+	LDI 1, FF      51 FF	; r1	<- $FF
 							; sr	<- %01
 	ADC 1, 1, 1    11 11	; r1	<- $FF
 							; sr	<- %01
@@ -48,28 +48,28 @@ MDF - FI__
 	BRA Zs, 00     EA 00	; sr	== %00
 20:                
 	BRA ZsCs, 00   EF 00	; sr	== %00
-	STO 1, 47      91 47	; [47]	<- $FF
+	STO 1, 47      81 47	; [47]	<- $FF
 							; sr	<- %00
-	LDI 1, 02      61 02	; r1	<- $02
+	LDI 1, 02      51 02	; r1	<- $02
 							; sr	<- %00
-	ROT 3, 2, 1    53 21	; r3	<- $54 = $55 << 2
+	ROT 3, 2, 1    43 21	; r3	<- $54 = $55 << 2
 							; sr	<- %01
-	STO 3, 48      93 48	; [48]	<- $54
+	STO 3, 48      83 48	; [48]	<- $54
 							; sr	<- %01
-	LDI 1, 09      61 09	; r1	<- $09
+	LDI 1, 09      51 09	; r1	<- $09
 							; sr	<- %01
-	ROT 3, 3, 1    53 31	; r3	<- $AA = C | $54 << 1
+	ROT 3, 3, 1    43 31	; r3	<- $9A = C | $54 >> 1
 							; sr	<- %00
-	STO 3, 49      93 49	; [49]	<- $9A
+	STO 3, 49      83 49	; [49]	<- $9A
 							; sr	<- %00
 30:
-	LDI 2, 07      62 07	; r2	<- $07
+	LDI 2, 07      52 07	; r2	<- $07
 							; sr	<- %00
-	LDI 1, 0B      61 0B	; r1	<- $0B
+	LDI 1, 0B      51 0B	; r1	<- $0B
 							; sr	<- %00
-	ROT 2, 2, 1    52 21	; r2	<- $C0 = $07 >> 3
+	ROT 2, 2, 1    42 21	; r2	<- $C0 = $07 >> 3
 							; sr	<- %01
-	STO 2, 4A      92 4A	; [4A]	<- $C0
+	STO 2, 4A      82 4A	; [4A]	<- $C0
 							; sr	<- %01
 	BRA Cc, 00     E4 00	; sr	== %01
 	HLT            00 FF	; Halt
@@ -77,50 +77,65 @@ MDF - FI__
 80:
 	PSH 1          A1 BA	; [FC]	<- $50
 							; r15	<- $FB
-	LDI 1, 20      61 20	; r1	<- $20
-							; sr	<- 01
-	LDR 1, 1       80 11	; r1	<- $EF = [20]
-							; sr	<- 01
-	STO 1, 41      91 41	; [41]	<- $EF
-							; sr	<- 01
-	LDI 1, AA      61 AA	; r1	<- $AA
-							; sr	<- 01
-	LDI 2, 55      62 55	; r2	<- $55
-							; sr	<- 01
-	STO 2, 42      92 42	; [42]	<- $55
-							; sr	<- 01
+	LDI 1, 20      51 20	; r1	<- $20
+							; sr	<- %01
+	LDR 1, 1       70 11	; r1	<- $EF = [20]
+							; sr	<- %01
+	STO 1, 41      81 41	; [41]	<- $EF
+							; sr	<- %01
+	LDI 1, AA      51 AA	; r1	<- $AA
+							; sr	<- %01
+	LDI 2, 55      52 55	; r2	<- $55
+							; sr	<- %01
+	STO 2, 42      82 42	; [42]	<- $55
+							; sr	<- %01
 	AND 3, 1, 2    23 12	; r3	<- $00 = $AA & $55
-							; sr	<- 11
-	STO 3, 43      93 43	; [43]	<- $00
-							; sr	<- 11
-90:                
-	ORR 4, 1, 2    34 12	; r4	<- $FF = $AA | $55
+							; sr	<- %11
+90:
+	STO 3, 43      83 43	; [43]	<- $00
+							; sr	<- %11     
+	; REPLACE
+	;ORR 4, 1, 2    34 12	; r4	<- $FF = $AA | $55
 							; sr	<- 01
-	STO 4, 44      94 44	; [44]	<- $FF
+	; Replacement for ORR, A ^ $FF = ~A
+	; ~(~A & ~B) = A | B
+	LDI E, FF      5E FF	; rE	<- $FF
+							; sr	<- %01
+	XOR 4, 1, E    34 1E	; r4	<- $55 = $AA ^ $FF
+							; sr	<- %01
+	XOR 5, 2, E    35 2E	; r5	<- $AA = $55 ^ $FF
+							; sr	<- %01
+	AND 4, 4, 5    24 45	; r4	<- $00 = $55 & $AA
+							; sr	<- %11
+	XOR 4, 4, E    34 4E	; r4	<- $FF = $00 ^ $FF
+							; sr	<- %01
+	LDI 5, 44      55 44	; r5	<- $44
+							; sr	<- %01
+	STR 4, 5       90 45	; [44]	<- $FF
 							; sr	<- 01
-	XOR 5, 2, 4    45 24	; r5	<- $AA = $55 ^ $FF
+A0:
+	XOR 5, 2, 4    35 24	; r5	<- $AA = $55 ^ $FF
 							; sr	<- 01
-	STO 5, 45      95 45	; [45]	<- $AA
+	STO 5, 45      85 45	; [45]	<- $AA
 							; sr	<- 01
-	LDM 5, 41      75 41	; r5	<- $EF
+	LDM 5, 41      65 41	; r5	<- $EF
 							; sr	<- 01
-	STO 5, 46      95 46	; [46]	<- $EF
+	STO 5, 46      85 46	; [46]	<- $EF
 							; sr	<- 01
 	POP 1          B1 00	; r1	<- $50
 							; r15	<- $FC
 							; sr	<- 01
-A0:
 	RET            D0 00	; pc	<- $0C
 							; r15	<- $FD
 	
 Expected output: 
 
 40:
-	50 20
+	50 EF
 	55 00
 	FF AA
 	20 FF
-	54 AA
+	54 9A
 	C0 00
 
 F0:
