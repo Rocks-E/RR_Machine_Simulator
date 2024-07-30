@@ -54,51 +54,54 @@ The following instructions can be used in main memory:
   - 4RST
   - XOR registers
   - S ^ T -> R
+- ROT
+  - 5RST
+  - ROTate register
+  - T[4] controls direction (0 for left, 1 for right)
+  - T[567] control the count to rotate S by (0-7)
+  - The carry bit is used as a "9th" bit off the left side for a left rotate or the right side for a right rotate
 - LDI
-  - 5RXX
+  - 6RXX
   - LoaD Immediate
   - XX -> R
 - LDM
-  - 6RMM
+  - 7RMM
   - LoaD from Memory
   - Mem[MM] -> R
+- LDR
+  - 8_RS
+  - LoaD from memory with Register offset
+  - Mem[S] -> R 
 - STO
-  - 7RMM
+  - 9RMM
   - STOre in memory
   - R -> Mem[MM]
 - PSH
-  - 8R__
+  - AR__
   - PuSH register to stack
   - R -> [SP--]
 - POP
-  - 9R__
+  - BR__
   - POP stack to register
   - [++SP] -> R
-- JMP
-  - A_XX
-  - JuMP
-  - XX -> PC
 - JSR
-  - B_XX
+  - C_XX
   - Jump to SubRoutine
   - PC + 2 -> [SP--]; XX -> PC
 - RET
-  - C___
+  - D___
   - RETurn from subroutine
   - [++SP] -> PC
-- BRZ
-  - D_XX
-  - BRanch on Zero
-  - Z ? (XX : PC + 2) -> PC
-- BRC
-  - E_XX
-  - BRanch on Carry
-  - C ? (XX : PC + 2) -> PC
+- BRA
+  - EIXX
+  - BRAnch on status conditions*
 - MDF
   - FI__
   - MoDify Flags*
 
 *[I] can be broken down into two 2-bit fields as follows:
-- 01 -> Which flags (0 - Z, 1 - C) should be modified. If the flag's bit is 1, it will be changed to the corresponding bit in the second field. If the flag's bit is 0, it will remain as it was before the instruction
-- 23 -> Determines the new state of its respective flag
-- e.g., 0111 would set the carry flag to 1 and leave Z as it was before. 0101 would do the same, as bit 0 being low tells the machine to ignore bit 2
+- 01 -> Which flags (0 - Z, 1 - C) should be considered. If the flag's bit is 1, the corresponding bit in the second field is used. If the flag's bit is 0, the corresponding bit in the second field is ignored.
+- 23 -> If the corresponding bit in the first field was set, determines what to do with the status flag
+- BRA ex., 0111 would branch if the carry flag is 1, regardless of the state of the zero flag. 0101 would do the same, as the zero flag bit in the first field is low.
+- Note: If I <= 3 it will ALWAYS be an unconditional jump as neither flag is considered
+- MDF ex., 1001 would set the zero flag to 0 and leave the carry flag as it was before. 1000 would do the same, as bit 0 being low tells the machine to ignore bit 3.
