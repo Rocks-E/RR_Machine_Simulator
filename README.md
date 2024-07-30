@@ -6,20 +6,23 @@ Inspired/made in spite of the Brookshear machine. Intent is to eventually finish
 This machine is not meant to replicate existing modern CPU instruction sets or architecture, nor is it meant to necessarily emulate "good" CPU design. Instead, it is intended to be a simplified view of machine language and processor cycles for early students - similar to the Brookshear machine. 
 
 Currently no command-line or graphical interface exists. The machine is a struct (rr_machine_t) consisting of the following fields:
-- 1-byte program counter
-- 1-byte status register - ____SSZC
+- Program counter (1-byte)
+- Status register (1-byte)
+  - ____SSZC
   - The top four bits are unused
   - The next two bits (SS) are internal to the machine and hold its current state in the fetch-decode-execute cycle, as well as a fourth state for halt
   - The last two bits are the zero and carry flags respectively, holding information on the results of previous instructions
-- 2-byte instruction register
-- **15** 1-byte general-purpose registers
-- **1** 1-byte special-purpose register, the stack pointer
+- Instruction register (2-byte)
+- 15 general-purpose registers (1-byte)
+- 1 special-purpose register, the stack pointer (1-byte)
   - Empty stack convention, grows down from 0xFF
-- 256 bytes of main memory
-- 3-char string holding the current instruction name
+- 256 main memory cells (1-byte)
+- Internal string holding the current instruction name (3-char)
   - To be used in the future for the front end, populated during each decode step
-- **4** 1-byte operand variables
+- 4 operand variables (1-byte)
   - Also populated in the decode step, used in the execute step as the work is already done anyway
+  - operands[0] always holds the opcode
+  - operands[1-3] hold the operands used by the instruction if it has any
 
 The following functions are provided to use the machine:
 - `rr_machine_t *machine_new()` -> Allocates memory for a machine struct, initializes all values to 0 except the stack pointer (register 15) which is initialized to 255
