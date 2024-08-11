@@ -8,6 +8,9 @@
 
 #define REG(m, x) (m->registers[x])
 #define MEM(m, x) (m->memory[x])
+#define CURRENT_STATE(m) (m->status_register >> 2)
+#define ZERO_SET(m) ((m->status_register >> 1) & 1)
+#define CARRY_SET(m) (m->status_register & 1)
 #define STACK_POINTER(m) (REG(m, 15))
 // m->memory[m->registers[15]++] = x
 #define MACHINE_PUSH(m, x) (MEM(m, STACK_POINTER(m)--) = x)
@@ -38,7 +41,7 @@ typedef struct rr_machine_d {
 	// 256 bytes for RAM
 	u8 memory[256];
 	// Decode variables, holds instruction mnemonics and operands
-	char instruction_name[3];
+	//char instruction_name[4];
 	u8 operands[4];
 } rr_machine_t;
 

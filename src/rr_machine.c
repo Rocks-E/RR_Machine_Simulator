@@ -1,6 +1,7 @@
 #include "rr_machine.h"
 
-const char *instruction_mnemonics[16] = {
+/*
+const char instruction_mnemonics[16][3] = {
 	"HLT",
 	"ADC",
 	"AND",
@@ -18,6 +19,7 @@ const char *instruction_mnemonics[16] = {
 	"BRA",
 	"MDF"
 };
+*/
 
 // Create a base machine
 rr_machine_t *machine_new() {
@@ -65,7 +67,7 @@ void machine_decode(rr_machine_t *machine) {
 	
 	// Get this instruction number and copy the instruction mnemonic to the machine
 	u8 instr = machine->instruction_register >> 12;
-	memcpy(machine->instruction_name, instruction_mnemonics[instr], 3);
+	//memcpy(machine->instruction_name, instruction_mnemonics[instr], 3);
 	
 	// Set operands[0] to the instruction number so we don't need to shift again during execute
 	machine->operands[0] = instr;
@@ -183,7 +185,7 @@ void machine_execute(rr_machine_t *machine) {
 			
 			{
 				
-				u16 temp = REG(machine, machine->operands[2]) + REG(machine, machine->operands[3]) + (machine->status_register & 1);
+				u16 temp = REG(machine, machine->operands[2]) + REG(machine, machine->operands[3]) + CARRY_SET(machine);
 				REG(machine, machine->operands[1]) = temp & 0xFF;
 				
 				// Update status register - [SS] -> maintain, [Z] -> set when the result is 0, [C] -> set when the result exceeds 255
@@ -228,7 +230,7 @@ void machine_execute(rr_machine_t *machine) {
 				// Rotate right
 				if(REG(machine, machine->operands[3]) & 0b1000) {
 					
-					temp = (machine->status_register & 0b01) << (8 - shift_count);
+					temp = CARRY_SET(machine) << (8 - shift_count);
 					temp |= REG(machine, machine->operands[2]) >> shift_count;
 					temp |= REG(machine, machine->operands[2]) << (9 - shift_count);
 					
@@ -241,7 +243,7 @@ void machine_execute(rr_machine_t *machine) {
 				// Rotate left
 				else {
 					
-					temp = (machine->status_register & 0b01) << (shift_count - 1);
+					temp = CARRY_SET(machine) << (shift_count - 1);
 					temp |= REG(machine, machine->operands[2]) >> (9 - shift_count);
 					temp |= REG(machine, machine->operands[2]) << shift_count;
 					
