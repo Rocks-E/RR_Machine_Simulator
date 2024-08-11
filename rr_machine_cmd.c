@@ -62,7 +62,7 @@ s32 main(s32 argc, const char **argv) {
 	
 	// Allocate space for 4090 character file path
 	operand_buffers[0] = (char *)malloc(OP_1_BUFFER_SIZE);
-	// Allocate space for delay/step count/value - works with octal/decimal/hexadecimal
+	// Allocate space for delay/step count/value - works with just hexadecimal
 	operand_buffers[1] = (char *)malloc(OP_2_BUFFER_SIZE);
 	
 	// Parameters for save/load commands and full run commands respectively
@@ -122,7 +122,7 @@ u8 run_command(rr_machine_t *machine, char *cmd, char **operands) {
 	else if(!strcmp(cmd, "step")) {
 		
 		u8 run_type = strcmp(operands[0], "part");
-		u16 step_count = operands[1] ? strtoul(operands[1], NULL, 0) : 1;
+		u16 step_count = operands[1] ? strtoul(operands[1], NULL, 16) : 1;
 		
 		for(; step_count > 0; step_count--)
 			if(run_type)
@@ -134,7 +134,7 @@ u8 run_command(rr_machine_t *machine, char *cmd, char **operands) {
 	else if(!strcmp(cmd, "run")) {
 		
 		u8 run_type = strcmp(operands[0], "part");
-		u16 delay_ms = operands[1] ? strtoul(operands[1], NULL, 0) : 0;
+		u16 delay_ms = operands[1] ? strtoul(operands[1], NULL, 16) : 0;
 		
 		if(run_type)
 			machine_run_part(machine, delay_ms);
@@ -144,7 +144,7 @@ u8 run_command(rr_machine_t *machine, char *cmd, char **operands) {
 	}
 	else if(!strcmp(cmd, "poke")) {
 		
-		u16 new_value = strtoul(operands[1], NULL, 0);
+		u16 new_value = strtoul(operands[1], NULL, 16);
 		
 		switch(operands[0][0]) {
 			
@@ -159,10 +159,22 @@ u8 run_command(rr_machine_t *machine, char *cmd, char **operands) {
 			case '7':
 			case '8':
 			case '9':
+			case 'A':
+			case 'a':
+			case 'B':
+			case 'b':
+			case 'C':
+			case 'c':
+			case 'D':
+			case 'd':
+			case 'E':
+			case 'e':
+			case 'F':
+			case 'f':
 			
 			{
 				
-				u8 mem_location = strtoul(operands[0], NULL, 0);
+				u8 mem_location = strtoul(operands[0], NULL, 16);
 				
 				MEM(machine, mem_location) = new_value;
 				
@@ -175,7 +187,7 @@ u8 run_command(rr_machine_t *machine, char *cmd, char **operands) {
 			
 			{
 				
-				u8 reg_location = strtoul(operands[0] + 1, NULL, 0);
+				u8 reg_location = strtoul(operands[0] + 1, NULL, 16);
 				
 				REG(machine, reg_location) = new_value;
 				
@@ -218,10 +230,22 @@ u8 run_command(rr_machine_t *machine, char *cmd, char **operands) {
 			case '7':
 			case '8':
 			case '9':
+			case 'A':
+			case 'a':
+			case 'B':
+			case 'b':
+			case 'C':
+			case 'c':
+			case 'D':
+			case 'd':
+			case 'E':
+			case 'e':
+			case 'F':
+			case 'f':
 			
 			{
 				
-				u8 mem_location = strtoul(operands[0], NULL, 0);
+				u8 mem_location = strtoul(operands[0], NULL, 16);
 				
 				fprintf(stdout, "[%02X]: $%02X\n", mem_location, MEM(machine, mem_location));
 				
@@ -234,7 +258,7 @@ u8 run_command(rr_machine_t *machine, char *cmd, char **operands) {
 			
 			{
 				
-				u8 reg_location = strtoul(operands[0] + 1, NULL, 0);
+				u8 reg_location = strtoul(operands[0] + 1, NULL, 16);
 				
 				fprintf(stdout, "Register %X: $%02X\n", reg_location, REG(machine, reg_location));
 				

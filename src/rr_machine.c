@@ -389,6 +389,7 @@ void machine_step_part(rr_machine_t *machine) {
 		
 		case 0b11:
 			// Halt
+			break;
 		
 	}
 	
