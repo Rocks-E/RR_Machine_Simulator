@@ -5,7 +5,7 @@ Inspired/made in spite of the Brookshear machine. Intent is to eventually finish
 
 This machine is not meant to replicate existing modern CPU instruction sets or architecture, nor is it meant to necessarily emulate "good" CPU design. Instead, it is intended to be a simplified view of machine language and processor cycles for early students - similar to the Brookshear machine. 
 
-Currently no command-line or graphical interface exists. The machine is a struct (rr_machine_t) consisting of the following fields:
+Currently no graphical interface exists - instructions on using the command-line interface are below. The machine is a struct (rr_machine_t) consisting of the following fields:
 - Program counter (1-byte)
 - Status register (1-byte)
   - ____SSZC
