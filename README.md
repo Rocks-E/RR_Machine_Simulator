@@ -117,13 +117,13 @@ To use the command-line interface, go to the releases page and download either t
 - step \[\<part\|full\>,\<number of steps\>\]
   - steps the machine in parts or full steps (full if not specified), number of steps defaults to 1 if not specified [NOTE: THIS CURRENTLY IS NOT WORKING]
 -	run \[\<part\|full\>,\<delay\>\]
-  -	runs the machine in partial or full steps (full if not specified) with an optional delay in milliseconds [NOTE: DELAY DOES NOTHING CURRENTLY]
+	- runs the machine in partial or full steps (full if not specified) with an optional delay in milliseconds [NOTE: DELAY DOES NOTHING CURRENTLY]
 -	poke \<location*\>,\<value\>
-  -	sets a given memory location to the specified value
+	-	sets a given memory location to the specified value
 -	peek \<location*\>
-  -	view a given memory location's value
+	- view a given memory location's value
 -	dump
-  -	print all machine contents (main memory, general purpose registers, status register, instruction register, program counter
+	-	print all machine contents (main memory, general purpose registers, status register, instruction register, program counter
   
 *Special locations include the following:
 -	r[0-F] 	(registers)
