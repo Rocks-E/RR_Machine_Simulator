@@ -108,3 +108,19 @@ The following instructions can be used in main memory:
 - BRA ex., 0111 would branch if the carry flag is 1, regardless of the state of the zero flag. 0101 would do the same, as the zero flag bit in the first field is low.
 - Note: If I <= 3 it will ALWAYS be an unconditional jump as neither flag is considered
 - MDF ex., 1001 would set the zero flag to 0 and leave the carry flag as it was before. 1000 would do the same, as bit 0 being low tells the machine to ignore bit 3.
+
+To use the command-line interface, go to the releases page and download either the Linux or Windows version. The following commands are available:
+- save <file path> 						          - saves the current main memory contents to a binary file
+- load <file path> 						          - loads main memory with the contents of a 256 byte binary file
+- step [<part|full>,<number of steps>] 	- steps the machine in parts or full steps (full if not specified), number of steps defaults to 1 if not specified [NOTE: THIS CURRENTLY IS NOT WORKING]
+-	run [<part|full>,<delay>] 				    - runs the machine in partial or full steps (full if not specified) with an optional delay in milliseconds [NOTE: DELAY DOES NOTHING CURRENTLY]
+-	poke <location*>,<value> 				      - sets a given memory location to the specified value
+-	peek <location*>						          - view a given memory location's value
+-	dump									                - print all machine contents (main memory, general purpose registers, status register, instruction register, program counter
+  
+*Special locations include the following:
+-	r[0-15] 	(registers)
+-	sp OR r15 (stack pointer)
+-	pc 			  (program_counter)
+-	ir 			  (instruction register) - poking may lead to undefined behavior
+-	sr 			  (status register)
