@@ -38,7 +38,8 @@ void machine_load(rr_machine_t *machine, const char *memory_filename) {
 	
 	FILE *mem_file = fopen(memory_filename, "r");
 	
-	fread((char *)machine->memory, sizeof(u8), 256, mem_file);
+	if(!fread((char *)machine->memory, sizeof(u8), 256, mem_file))
+		exit(1);
 	
 	fclose(mem_file);
 	

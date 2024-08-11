@@ -65,10 +65,6 @@ s32 main(s32 argc, const char **argv) {
 	// Allocate space for delay/step count/value - works with just hexadecimal
 	operand_buffers[1] = (char *)malloc(OP_2_BUFFER_SIZE);
 	
-	// Parameters for save/load commands and full run commands respectively
-	char *filename;
-	u64 delay;
-	
 	rr_machine_t *user_machine = machine_new();
 	
 	fprintf(stdout, "Issue commands to the machine (leave blank to exit):\n");
@@ -78,7 +74,9 @@ s32 main(s32 argc, const char **argv) {
 		u8 op_counter = 0;
 		
 		// Get a line of input and remove the newline
-		fgets(input_buffer, INPUT_BUFFER_SIZE, stdin);
+		if(!fgets(input_buffer, INPUT_BUFFER_SIZE, stdin))
+			exit(1);
+		
 		input_buffer[strcspn(input_buffer, "\n")] = 0;
 		
 		// Exit if nothing was input
