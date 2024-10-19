@@ -4,7 +4,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
+// Redefines datatypes for simplicity, includes inttypes.h
+#include "../../shared/shared_datatypes.h"
+
+#if defined(_WIN32)
+#include <windows.h>
+#elif defined(__unix__) 
+#include <time.h>
+#include <errno.h>
+#else
+#error "PLATFORM NOT SUPPORTED"
+#endif
 
 #define REG(m, x) (m->registers[x])
 #define MEM(m, x) (m->memory[x])
@@ -17,18 +27,9 @@
 // m->memory[++(m->registers[15])]
 #define MACHINE_POP(m) (MEM(m, ++STACK_POINTER(m)))
 
-typedef uint8_t 	u8;
-typedef uint16_t 	u16;
-typedef uint32_t 	u32;
-typedef uint64_t 	u64;
-typedef int8_t 		s8;
-typedef int16_t 	s16;
-typedef int32_t 	s32;
-typedef int64_t 	s64;
-typedef float 		f32;
-typedef double 		f64;
-
 typedef struct rr_machine_d {
+	// Decode variables, holds operands
+	u8 operands[4];
 	// Controls where the program is in memory
 	u8 program_counter;
 	// Status register, SSZC - State (00 -> fetch, 01 -> decode, 10 -> execute, 11 -> halt), Zero, Carry
@@ -40,25 +41,25 @@ typedef struct rr_machine_d {
 	u8 registers[16];
 	// 256 bytes for RAM
 	u8 memory[256];
-	// Decode variables, holds instruction mnemonics and operands
-	//char instruction_name[4];
-	u8 operands[4];
 } rr_machine_t;
 
 // Create a base machine
 rr_machine_t *machine_new();
 
+u8 machine_reset(rr_machine_t *machine);
+u8 machine_clear_memory(rr_machine_t *machine);
+
 // Load/save machine memory from file
-void machine_load(rr_machine_t *machine, const char *memory_filename);
-void machine_save(rr_machine_t *machine, const char *memory_filename);
+u8 machine_load(rr_machine_t *machine, const char *memory_filename);
+u8 machine_save(rr_machine_t *machine, const char *memory_filename);
 
 // Run whichever part of the machine cycle the machine is on
-void machine_step_part(rr_machine_t *machine);
+u8 machine_step_part(rr_machine_t *machine);
 // Run a full machine cycle (up to the next one, will only run the current cycle to the end)
-void machine_step_full(rr_machine_t *machine);
+u8 machine_step_full(rr_machine_t *machine);
 
 // Run the entire program (up to a HALT) in parts or full cycles with an optional delay between each part/cycle
-void machine_run_part(rr_machine_t *machine, u64 delay);
-void machine_run_full(rr_machine_t *machine, u64 delay);
+u8 machine_run_part(rr_machine_t *machine, u64 delay);
+u8 machine_run_full(rr_machine_t *machine, u64 delay);
 
 #endif

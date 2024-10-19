@@ -1,26 +1,5 @@
 #include "rr_machine.h"
 
-/*
-const char instruction_mnemonics[16][3] = {
-	"HLT",
-	"ADC",
-	"AND",
-	"XOR",
-	"ROT",
-	"LDI",
-	"LDM",
-	"LDR",
-	"STO",
-	"STR",
-	"PSH",
-	"POP",
-	"JSR",
-	"RET",
-	"BRA",
-	"MDF"
-};
-*/
-
 // Create a base machine
 rr_machine_t *machine_new() {
 	
@@ -33,24 +12,60 @@ rr_machine_t *machine_new() {
 	
 }
 
-// Load/save machine memory from file
-void machine_load(rr_machine_t *machine, const char *memory_filename) {
+u8 machine_reset(rr_machine_t *machine) {
 	
-	FILE *mem_file = fopen(memory_filename, "r");
+	// Don't clear memory
+	memset(machine, 0, sizeof(rr_machine_t) - 256);
 	
-	if(!fread((char *)machine->memory, sizeof(u8), 256, mem_file))
-		exit(1);
-	
-	fclose(mem_file);
+	return 0;
 	
 }
-void machine_save(rr_machine_t *machine, const char *memory_filename) {
+
+u8 machine_clear_memory(rr_machine_t *machine) {
 	
-	FILE *mem_file = fopen(memory_filename, "w");
+	memset(machine->memory, 0, 256);
 	
-	fwrite((char *)machine->memory, sizeof(u8), 256, mem_file);
+	return 0;
+	
+}
+
+// Load/save machine memory from file
+u8 machine_load(rr_machine_t *machine, const char *memory_filename) {
+	
+	FILE *mem_file = fopen(memory_filename, "r");
+	if(!mem_file)
+		return 1;
+	
+	if(!fread((char *)machine->memory, sizeof(u8), 256, mem_file)) {
+		
+		fclose(mem_file);
+		
+		return 2;
+		
+	}
 	
 	fclose(mem_file);
+	
+	return 0;
+	
+}
+u8 machine_save(rr_machine_t *machine, const char *memory_filename) {
+	
+	FILE *mem_file = fopen(memory_filename, "w");
+	if(!mem_file)
+		return 1;
+	
+	if(fwrite((char *)machine->memory, sizeof(u8), 256, mem_file) != 256) {
+		
+		fclose(mem_file);
+		
+		return 2;
+		
+	}
+	
+	fclose(mem_file);
+	
+	return 0;
 	
 }
 
@@ -368,9 +383,9 @@ void machine_execute(rr_machine_t *machine) {
 }
 
 // Run whichever part of the machine cycle the machine is on
-void machine_step_part(rr_machine_t *machine) {
+u8 machine_step_part(rr_machine_t *machine) {
 	
-	switch(machine->status_register >> 2) {
+	switch(CURRENT_STATE(machine)) {
 		
 		case 0b00:
 			machine_fetch(machine);
@@ -384,7 +399,7 @@ void machine_step_part(rr_machine_t *machine) {
 		
 		case 0b10:
 			machine_execute(machine);
-			if(((machine->status_register) >> 2) != 3)
+			if(CURRENT_STATE(machine) != 3)
 			machine->status_register &= 0b0011;
 			break;
 		
@@ -394,37 +409,62 @@ void machine_step_part(rr_machine_t *machine) {
 		
 	}
 	
+	return CURRENT_STATE(machine);
+	
 }
 // Run a full machine cycle (up to the next one, will only run the current cycle to the end)
-void machine_step_full(rr_machine_t *machine) {
+u8 machine_step_full(rr_machine_t *machine) {
 	
-	u8 c = 3 - (machine->status_register >> 2);
-	
-	for(; c > 0; c--)
+	for(u8 c = CURRENT_STATE(machine); c < 3; c++)
 		machine_step_part(machine);
+	
+	return CURRENT_STATE(machine);
 	
 }
 
-// Run the entire program (up to a HALT) in parts or full cycles with an optional delay between each part/cycle
-void machine_run_part(rr_machine_t *machine, u64 delay) {
+#if defined(__unix__) 
+s32 msleep(u64 duration) {
 	
-	while((machine->status_register >> 2) < 0b11) {
-		
-		machine_step_part(machine);
-		
-		// Delay?
-		
-	}
+	struct timespec ts;
+	s32 nsleep_result;
+	
+	if(duration == 0)
+		return 0;
+	
+	ts.tv_sec = duration / 1000;
+	ts.tv_nsec = (duration % 1000) * 1000000;
+	
+	do {
+		nsleep_result = nanosleep(&ts, &ts);
+	} while(nsleep_result && errno == EINTR);
+	
+	return nsleep_result;
 	
 }
-void machine_run_full(rr_machine_t *machine, u64 delay) {
+#endif
+
+// Run the entire program (up to a HALT) in parts or full cycles with an optional delay between each part/cycle
+u8 machine_run_part(rr_machine_t *machine, u64 delay) {
+		
+	while(machine_step_part(machine) < 0b11)
+#if defined(_WIN32)
+		Sleep(delay);
+#elif defined(__unix__)
+		msleep(delay);
+#endif
+
+	return 0;
 	
-	while((machine->status_register >> 2) < 0b11) {
-		
-		machine_step_full(machine);
-		
-		// Delay?
-		
-	}
+}
+u8 machine_run_full(rr_machine_t *machine, u64 delay) {
+	
+	while(machine_step_full(machine) < 0b11)
+#if defined(_WIN32)
+		Sleep(delay);
+#elif defined(__unix__)
+		msleep(delay);
+#endif
+
+	return 0;
 	
 }
