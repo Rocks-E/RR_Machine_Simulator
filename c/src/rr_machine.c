@@ -16,6 +16,7 @@ u8 machine_reset(rr_machine_t *machine) {
 	
 	// Don't clear memory
 	memset(machine, 0, sizeof(rr_machine_t) - 256);
+	STACK_POINTER(machine) = 0xFF;
 	
 	return 0;
 	
