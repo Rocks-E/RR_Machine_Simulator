@@ -53,13 +53,10 @@ u8 machine_clear_memory(rr_machine_t *machine);
 u8 machine_load(rr_machine_t *machine, const char *memory_filename);
 u8 machine_save(rr_machine_t *machine, const char *memory_filename);
 
-// Run whichever part of the machine cycle the machine is on
-u8 machine_step_part(rr_machine_t *machine);
-// Run a full machine cycle (up to the next one, will only run the current cycle to the end)
-u8 machine_step_full(rr_machine_t *machine);
+// Run part or the remainder of a machine cycle
+u8 machine_step(rr_machine_t *machine, u8 part_step);
 
 // Run the entire program (up to a HALT) in parts or full cycles with an optional delay between each part/cycle
-u8 machine_run_part(rr_machine_t *machine, u64 delay);
-u8 machine_run_full(rr_machine_t *machine, u64 delay);
+u8 machine_run(rr_machine_t *machine, u8 part_step, u64 delay);
 
 #endif

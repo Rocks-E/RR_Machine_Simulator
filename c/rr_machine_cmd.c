@@ -367,10 +367,7 @@ u8 run_command(rr_machine_t *machine, char *cmd, char **operands) {
 			STR_TO_UINT(operands[op0_specified], step_count);
 		
 		while(step_count--)
-			if(part_run)
-				machine_step_part(machine);
-			else
-				machine_step_full(machine);
+			machine_step(machine, part_run);
 		
 	}
 	else if(!strcmp(cmd, "run")) {
@@ -391,10 +388,7 @@ u8 run_command(rr_machine_t *machine, char *cmd, char **operands) {
 		if(operands[op0_specified][0])
 			STR_TO_UINT(operands[op0_specified], delay_ms);
 		
-		if(part_run)
-			machine_run_part(machine, delay_ms);
-		else
-			machine_run_full(machine, delay_ms);
+		machine_run(machine, part_run, delay_ms);
 		
 	}
 	else if(!strcmp(cmd, "poke")) {

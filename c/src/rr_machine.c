@@ -383,41 +383,33 @@ void machine_execute(rr_machine_t *machine) {
 	
 }
 
-// Run whichever part of the machine cycle the machine is on
-u8 machine_step_part(rr_machine_t *machine) {
+u8 machine_step(rr_machine_t *machine, u8 part_step) {
 	
-	switch(CURRENT_STATE(machine)) {
+	u8 loop_count = part_step ? 1 : (3 - CURRENT_STATE(machine));
+	
+	while(loop_count--)
+		switch(CURRENT_STATE(machine)) {
 		
-		case 0b00:
-			machine_fetch(machine);
-			machine->status_register |= 0b0100;
-			break;
+			case 0b00:
+				machine_fetch(machine);
+				machine->status_register |= 0b0100;
+				break;
+				
+			case 0b01:
+				machine_decode(machine);
+				machine->status_register += 0b0100;
+				break;
 			
-		case 0b01:
-			machine_decode(machine);
-			machine->status_register += 0b0100;
-			break;
-		
-		case 0b10:
-			machine_execute(machine);
-			if(CURRENT_STATE(machine) != 3)
-			machine->status_register &= 0b0011;
-			break;
-		
-		case 0b11:
-			// Halt
-			break;
-		
-	}
-	
-	return CURRENT_STATE(machine);
-	
-}
-// Run a full machine cycle (up to the next one, will only run the current cycle to the end)
-u8 machine_step_full(rr_machine_t *machine) {
-	
-	for(u8 c = CURRENT_STATE(machine); c < 3; c++)
-		machine_step_part(machine);
+			case 0b10:
+				machine_execute(machine);
+				if(CURRENT_STATE(machine) != 3)
+				machine->status_register &= 0b0011;
+				break;
+			
+			case 0b11:
+				// Halt
+				break;
+		}
 	
 	return CURRENT_STATE(machine);
 	
@@ -445,21 +437,9 @@ s32 msleep(u64 duration) {
 #endif
 
 // Run the entire program (up to a HALT) in parts or full cycles with an optional delay between each part/cycle
-u8 machine_run_part(rr_machine_t *machine, u64 delay) {
-		
-	while(machine_step_part(machine) < 0b11)
-#if defined(_WIN32)
-		Sleep(delay);
-#elif defined(__unix__)
-		msleep(delay);
-#endif
-
-	return 0;
+u8 machine_run(rr_machine_t *machine, u8 part_step, u64 delay) {
 	
-}
-u8 machine_run_full(rr_machine_t *machine, u64 delay) {
-	
-	while(machine_step_full(machine) < 0b11)
+	while(machine_step(machine, part_step) < 0b11)
 #if defined(_WIN32)
 		Sleep(delay);
 #elif defined(__unix__)
